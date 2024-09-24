@@ -1,0 +1,509 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="main.min.css">
+    <script src="vue3.js"></script>
+    <script>
+        function UUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0,
+                    v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+    </script>
+</head>
+
+<body>
+    <div id="globalcontainer">
+        <div class="head" @mousedown="move()" @mouseup="stop()">
+            <div class="windowhead">
+                <div class="title">File Search</div>
+                <div class="btns">
+                    <div v-for="item in topbtns" :class="item.id" @click="item.func()">
+                        <img :src="item.icon" />
+                    </div>
+                </div>
+            </div>
+            <div class="searchbar">
+                <div class="searchbar_container">
+                    <div class="search">
+                        <input v-model="input" type="text" class="input" @keydown="search.keydown($event)"
+                            @input="search.oninput($event)" placeholder="关键词">
+                        <div class="search_btn" @click="search.click()">
+                            <svg t="1726834480647" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                xmlns="http://www.w3.org/2000/svg" p-id="6714" width="200" height="200">
+                                <path
+                                    d="M765.1368425 734.82105219v0.05052656l3.1831575 3.33473719 177.34736813 190.02947344a35.36842125 35.36842125 0 1 1-51.68842032 48.25263187l-177.04421062-189.67578937-3.13263188-3.28421063-2.02105312-2.12210531a69.72631594 69.72631594 0 0 1-1.92-98.52631594 340.54736812 340.54736812 0 0 0 95.34315844-237.01894781c0-188.71578937-153.49894781-342.31578938-342.06315844-342.31578938-188.51368406 0-341.96210531 153.6-341.96210438 342.31578938 0 188.71578937 153.44842125 342.31578938 341.91157875 342.31579031 38.75368406-0.05052656 76.29473719-6.36631594 112.16842125-18.79579031a35.36842125 35.36842125 0 1 1 23.24210438 66.79579031 412.29473719 412.29473719 0 0 1-135.41052563 22.73684156c-227.57052656 0-412.64842125-185.28-412.64842125-413.05263187C50.44210531 218.08842125 235.52 32.80842125 463.14105219 32.80842125c227.62105219 0 412.8 185.28 412.8 413.05263094a411.28421062 411.28421062 0 0 1-114.39157875 285.27157969l3.5368425 3.68842031z"
+                                    fill="#515151" p-id="6715"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="divad"></div>
+                </div>
+                <div class="settings">
+                    <div class="left">
+                        <div v-for="item in settings.left" class="setting" @click="settings.leftFunc(item)">
+                            <div class="radio">
+                                <svg v-show="!item.chozen" class="false" t="1726839336808" class="icon"
+                                    viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1633"
+                                    width="200" height="200">
+                                    <path
+                                        d="M186 123c-33.137 0-60 26.863-60 60v655c0 33.137 26.863 60 60 60h655c33.137 0 60-26.863 60-60V183c0-33.137-26.863-60-60-60H186z m0-60h655c66.274 0 120 53.726 120 120v655c0 66.274-53.726 120-120 120H186c-66.274 0-120-53.726-120-120V183c0-66.274 53.726-120 120-120z"
+                                        fill="#2F54EB" p-id="1634"></path>
+                                </svg>
+                                <svg v-show="item.chozen" class="true" t="1726838658845" class="icon"
+                                    viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1470"
+                                    width="200" height="200">
+                                    <path
+                                        d="M186 63h655c66.274 0 120 53.726 120 120v655c0 66.274-53.726 120-120 120H186c-66.274 0-120-53.726-120-120V183c0-66.274 53.726-120 120-120z"
+                                        fill="#2F54EB" p-id="1471"></path>
+                                    <path
+                                        d="M391.84 648.34l321.887-321.635c15.627-15.615 40.953-15.605 56.568 0.022 15.615 15.627 15.605 40.953-0.022 56.568L419.957 733.338c-15.679 15.666-41.108 15.597-56.7-0.156L201.571 569.845c-15.541-15.7-15.412-41.027 0.288-56.568 15.7-15.541 41.026-15.413 56.568 0.288L391.84 648.34z"
+                                        fill="#FFFFFF" p-id="1472"></path>
+                                </svg>
+
+                            </div>
+                            <input type="radio" style="display: none;">
+                            <span>{{item.name}}</span>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div v-for="item in settings.right" :class="item.type" class="setting"
+                            @click="item.func($event)">
+                            <template v-if="item.type=='icon'">
+                                <img v-show="sta.id==item.sta_chozen" v-for="sta in item.status" :src="sta.icon"
+                                    :alt="sta.name" class="status" />
+                            </template>
+                            <template v-if="item.type=='list'">
+                                <div class="chozen">
+                                    <img :src="item.icon" :alt="item.name" class="status" />
+                                    <span>{{item.status.filter(a=>a.id==item.sta_chozen)[0].name}}</span>
+                                </div>
+                                <div class="list" :style="{height:(item.showlist?'fit-content':'0')}">
+                                    <div v-for="sta in item.status" @click="item.stafunc(sta)">
+                                        {{sta.name}}
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="headplaceholder"></div>
+        <div class="maincontainer">
+
+            <div class="resultlist">
+                <div v-for="res in result.contains" class="result" @dblclick="openFile(res.path)">
+                    <div v-if="result.showtype=='CARD'" class="card">
+
+                    </div>
+                    <div v-if="result.showtype=='LIST'" class="list">
+                        <div class="thumbnail">
+                            <img :src="res.thumbnail" alt="">
+                        </div>
+                        <div class="info">
+                            <span class="name">{{res.name}}</span>
+                            <div class="path" @click="toclipboard(res.path)">{{res.path}}</div>
+                            <div class="other">
+                                <span class="size">{{getFormatedSize(res.size)}}</span>
+                                <span class="fileForm">{{res.fileForm}}</span>
+                                <span class="fileType">{{res.filetype}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mask">
+                <div class="mask_left"></div>
+                <div class="mask_right"></div>
+                <div class="mask_top"></div>
+                <div class="mask_bottom"></div>
+            </div>
+        </div>
+</body>
+
+<script>
+    const videotag = ["MP4", "AVI", "MKV", "MOV", "WMV", "FLV", "WEBM"]
+</script>
+<script>
+    class SearchResult {
+        constructor(name, path, size, time, type, filetype,fileForm) {
+
+            this.name = name;
+            this.path = path;
+            this.size = size;
+            this.time = time;
+            this.type = type;
+            this.filetype = filetype;
+            this.fileForm=fileForm;
+            switch (this.fileForm) {
+                case "VIDEO":
+                    this.thumbnail = "./icon/filetype_video.svg";
+                    break;
+                default:
+                    this.thumbnail = "./icon/filetype_unknown.svg";
+            }
+        }
+    }
+
+    class WsMesg {
+
+        constructor(type, args) {
+            this.sessionId = UUID();
+            this.type = type;
+            this.args = args;
+        }
+    }
+
+    const app = Vue.createApp({
+        data() {
+            return {
+                ws: new WebSocket("ws://localhost:8080/main"),
+                dataws: new WebSocket("ws://localhost:8080/data"),
+                topbtns: [
+                    {
+                        name: "最小化",
+                        id: "small",
+                        icon: "./icon/small.svg",
+                        func() {
+                            vm.$data.ws.send(JSON.stringify(new WsMesg("WINDOWS_SMALL")))
+                        }
+                    },
+                    {
+                        name: "最大化",
+                        id: "big",
+                        icon: "./icon/big.svg",
+                        func() {
+                            vm.$data.ws.send(JSON.stringify(new WsMesg("WINDOWS_BIG")))
+                        }
+                    },
+                    {
+                        name: "关闭",
+                        id: "close",
+                        icon: "./icon/close.svg",
+                        func() {
+                            vm.$data.ws.send(JSON.stringify(new WsMesg("WINDOWS_CLOSE")))
+                        }
+                    }
+                ],
+                input: "",
+                search: {
+                    fontSize: undefined,
+                    realWidth: undefined,
+                    maxWidth: undefined,
+                    nowSessionId: "",
+                    getRealLength(str) {
+                        let len = 0;
+                        for (let i = 0; i < str.length; i++) {
+                            let c = str.charCodeAt(i);
+                            //单字节加1
+                            if ((c >= 0x0001 && c <= 0x007e) || (0xff60 <= c && c <= 0xff9f)) {
+                                len++;
+                            }
+                            else {
+                                len += 2;
+                            }
+                        }
+                        return len;
+                    },
+                    getClipedLength(str) {
+                        return this.getRealLength(str) * this.fontSize.replace("px", "");
+                    },
+                    oninput(e) {
+                        let input = document.querySelector(".input");
+                        if (this.fontSize == undefined) {
+                            this.fontSize = window.getComputedStyle(input).fontSize.replace("px", "");
+                        }
+                        if (this.realWidth == undefined) {
+                            this.realWidth = window.getComputedStyle(input).width.replace("px", "");
+                        }
+                        if (this.maxWidth == undefined) {
+                            this.maxWidth = window.getComputedStyle(input).maxWidth.replace("px", "");
+                        }
+
+                        input.style.width = (
+                            Math.max(
+                                this.getClipedLength(e.target.value),
+                                this.realWidth
+                            )
+                        );
+                    },
+                    keydown(e) {
+                        if (e.key == "Enter") {
+                            // beep();
+                            this.search(vm.$data.input);
+                        }
+                    },
+                    search_btn() {
+                        this.search(vm.$data.input);
+                    },
+                    search(str) {
+                        vm.$data.result.contains = [];
+                        let args = [{
+                            id: "keyword",
+                            key: str
+                        }];
+                        args = args.concat(vm.$data.settings.left.map(a => {
+                            return {
+                                id: a.id,
+                                key: a.chozen
+                            }
+                        }));
+                        let wsp = new WsMesg("SEARCH", args);
+                        this.nowSessionId = wsp.sessionId;
+                        vm.$data.ws.send(JSON.stringify(wsp));
+                    },
+                    click(e) {
+                        this.search(vm.$data.input);
+                    }
+                },
+                settings: {
+                    leftFunc(c) {
+                        c.chozen = !c.chozen;
+                    },
+                    left: [
+                        {
+                            chozen: false,
+                            name: "正则",
+                            id: "use_pattern"
+
+                        },
+                        {
+                            chozen: false,
+                            name: "大小写敏感",
+                            id: "case_unsence"
+                        },
+                        {
+                            chozen: false,
+                            name: "使用缓存",
+                            id: "use_cache"
+                        },
+                        {
+                            chozen: false,
+                            name: "分组",
+                            id: "use_group"
+                        }
+                    ],
+                    right: [
+                        {
+                            name: "排序规则",
+                            type: "list",
+                            icon: "/icon/order_rule.svg",
+                            showlist: false,
+                            status: [
+                                {
+                                    name: "按时间",
+                                    id: "time_order"
+                                }, {
+                                    name: "按名称",
+                                    id: "name_order"
+                                }, {
+                                    name: "按大小",
+                                    id: "size_order"
+                                }, {
+                                    name: "按类型",
+                                    id: "type_order"
+                                }
+                            ],
+                            sta_chozen: "time_order",
+                            func(e) {
+
+                                this.showlist = !this.showlist;
+                            },
+                            stafunc(sta) {
+                                this.sta_chozen = sta.id;
+                            }
+
+                        },
+                        {
+                            name: "排序",
+                            type: "icon",
+                            status: [
+                                {
+                                    icon: "./icon/asc_order.svg",
+                                    name: "正序",
+                                    id: "asc_order"
+                                }, {
+                                    icon: "./icon/desc_order.svg",
+                                    name: "倒序",
+                                    id: "desc_order"
+                                }
+                            ],
+                            sta_chozen: "asc_order",
+                            func(e) {
+                                this.sta_chozen = this.status[(this.status.findIndex(a => a.id == this.sta_chozen) + 1) % this.status.length].id;
+                            },
+                        },
+                        {
+                            name: "展示方式",
+                            type: "icon",
+                            status: [
+                                {
+                                    icon: "./icon/card.svg",
+                                    name: "卡片",
+                                    id: "card"
+                                }, {
+                                    icon: "./icon/list.svg",
+                                    name: "列表",
+                                    id: "list"
+                                }
+                            ],
+                            sta_chozen: "list",
+                            func(e) {
+                                this.sta_chozen = this.status[(this.status.findIndex(a => a.id == this.sta_chozen) + 1) % this.status.length].id;
+                                result.showtype = this.sta_chozen.toUpperCase();
+                            },
+                        }
+                    ]
+                },
+                result: {
+                    showtype: "LIST",
+                    contains: [
+
+                    ]
+                }
+            }
+        },
+        methods: {
+            getFormatedSize(size) {
+                if (size < 1024) {
+                    return size + "B";
+                } else if (size < 1024 * 1024) {
+                    return (size / 1024).toFixed(2) + " KB";
+                } else if (size < 1024 * 1024 * 1024) {
+                    return (size / 1024 / 1024).toFixed(2) + " MB";
+                } else {
+                    return (size / 1024 / 1024 / 1024).toFixed(2) + " GB";
+                }
+            },
+            toclipboard(text){
+                // navigator.clipboard.writeText(text);
+            },
+            openFile(path) {
+                this.ws.send(JSON.stringify(new WsMesg("OPEN_FILE", [{
+                    id: "path",
+                    key: "\"" + path + "\""
+                }])));
+            },
+            move() {
+                this.ws.send(JSON.stringify(new WsMesg("MOVE")));
+            },
+            stop() {
+                this.ws.send(JSON.stringify(new WsMesg("STOP")));
+            },
+            recieveSearchResult(resultlist) {
+                resultlist.forEach(element => {
+                    let r = new SearchResult(
+                        element.name,
+                        element.path,
+                        element.size,
+                        element.time,
+                        element.type,
+                        element.fileType,
+                        element.fileForm
+                    );
+                    
+                    if (element.type == "FILE") {
+
+                        // if (videotag.includes(element.fileType)) {
+                        //     let video = document.createElement("video");
+                        //     video.src = element.path;
+                        //     console.log(video.src);
+                        //     video.addEventListener("loadedmetadata", () => {
+                        //         let canvas = new OffscreenCanvas(video.videoWidth, video.videoHeight);
+                        //         canvas.getContext("2d").drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+                        //         let filereader = new FileReader();
+                        //         filereader.onload = () => {
+                        //             r.icon = filereader.result;
+                        //             console.log(r.icon);
+                        //         }
+                        //         filereader.readAsDataURL(canvas.convertToBlob());
+                        //     })
+                        //     video.load();
+
+                        // }
+                    } else {
+
+                    }
+                    this.result.contains.push(r);
+
+                }
+                );
+            }
+
+        },
+        created() {
+            this.ws.onerror = () => {
+                this.ws = new WebSocket("ws://localhost:8080/main");
+            }
+            this.ws.onclose = () => {
+                this.ws = new WebSocket("ws://localhost:8080/main");
+            }
+            this.ws.onmessage = (e) => {
+                // beep();
+                let mesg = JSON.parse(e.data);
+                if (mesg.sessionId != this.search.nowSessionId) {
+                    return;
+                }
+                if (mesg.type == "SEARCH_RESULT") {
+
+                }
+                switch (mesg.type) {
+                    case "SEARCH_RESULT":
+                        this.recieveSearchResult(mesg.contains);
+                        break;
+                }
+            }
+
+            this.dataws.onerror = () => {
+                this.dataws = new WebSocket("ws://localhost:8080/data");
+            }
+            this.dataws.onclose = () => {
+                this.dataws = new WebSocket("ws://localhost:8080/data");
+            }
+            this.dataws.onmessage = (e) => {
+                let mesg = JSON.parse(e.data);
+                switch (mesg.type) {
+                    case "THUMBNAIL":
+                        mesg.contains.forEach(e=>{
+                            this.result.contains.filter(a => a.path == e.path)[0].thumbnail = "data:image/png;base64," + e.thumbnail;
+                        })
+                        break;
+                }
+            }
+
+
+        }
+    })
+    const vm = app.mount("#globalcontainer");
+    function beep() {
+        vm.$data.ws.send(JSON.stringify(new WsMesg("SOUND_BEEP")))
+    }
+</script>
+
+<script>
+
+
+
+
+
+    let mask_right = document.querySelector(".mask_right");
+    let mask_left = document.querySelector(".mask_left");
+    let mask_top = document.querySelector(".mask_top");
+    let mask_bottom = document.querySelector(".mask_bottom");
+
+
+</script>
+
+</html>
